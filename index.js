@@ -68,10 +68,19 @@ async function run() {
     app.post('/orders', async (req, res) => {
       const order = req.body;
       const result = await bookingCollection.insertOne(order);
-      console.log(order);
 
       res.json(result)
     })
+
+    // Delete an order api
+
+    app.delete('/orders/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const result = await servicesCollection.deleteOne(query);
+      res.json(result)
+    })
+
 
 
   }
