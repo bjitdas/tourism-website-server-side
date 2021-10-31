@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 const express = require('express')
 const cors = require('cors')
+const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config()
 
 const app = express()
@@ -23,6 +24,7 @@ async function run() {
     await client.connect();
     const database = client.db('tourismPark');
     const servicesCollection = database.collection('database');
+    const bookingCollection = database.collection('orders');
 
     // GET API
 
@@ -33,12 +35,40 @@ async function run() {
       res.send(services)
     })
 
+    // Get Single Service
+
+    app.get('/services/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const service = await servicesCollection.findOne(query);
+
+      res.json(service)
+    })
+
+    //Get orders api
+    app.get('/orders', async (req, res) => {
+      const cursor = bookingCollection.find({});
+      const orders = await cursor.toArray()
+
+      res.json(orders)
+    })
+
 
     // POST API
 
     app.post('/services', async (req, res) => {
       const service = req.body;
       const result = await servicesCollection.insertOne(service)
+
+      res.json(result)
+    })
+
+    //POST BOOKING API
+
+    app.post('/orders', async (req, res) => {
+      const order = req.body;
+      const result = await bookingCollection.insertOne(order);
+      console.log(order);
 
       res.json(result)
     })
